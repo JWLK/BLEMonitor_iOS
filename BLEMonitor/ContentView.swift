@@ -8,25 +8,43 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @ObservedObject var bleManager = BLEManager()
+    
     var body: some View {
+        
         VStack (spacing: 10) {
 
             Text("Bluetooth Devices")
                 .font(.largeTitle)
                 .frame(maxWidth: .infinity, alignment: .center)
-            List() {
-                Text("placeholder 1")
-                Text("placeholder 2")
+            List(bleManager.peripherals) { peripheral in
+                HStack {
+                    Text(peripheral.name)
+                    Spacer()
+                    
+                    Button(action: {
+                        self.bleManager.connectDevice(peripheral: peripheral.data)
+                    }) {
+                        Text("Connect")
+                    }
+                }
             }.frame(height: 300)
-
+            
             Spacer()
 
             Text("STATUS")
                 .font(.headline)
 
             // Status goes here
-            Text("Bluetooth status here")
-                .foregroundColor(.red)
+            if bleManager.isSwitchedOn {
+                Text("Bluetooth is switched on")
+                    .foregroundColor(.green)
+            }
+            else {
+                Text("Bluetooth is NOT switched on")
+                    .foregroundColor(.red)
+            }
 
             Spacer()
 
@@ -34,11 +52,13 @@ struct ContentView: View {
                 VStack (spacing: 10) {
                     Button(action: {
                         print("Start Scanning")
+                        self.bleManager.startScanning()
                     }) {
                         Text("Start Scanning")
                     }
                     Button(action: {
                         print("Stop Scanning")
+                        self.bleManager.stopScanning()
                     }) {
                         Text("Stop Scanning")
                     }
@@ -58,7 +78,16 @@ struct ContentView: View {
                         Text("Stop Advertising")
                     }
                 }.padding()
+                
             }
+            
+            Button(action: {
+                self.bleManager.peripherals = []
+            }) {
+                Text("Clear Data")
+                    .foregroundColor(.red)
+            }
+            
             Spacer()
             
         }
