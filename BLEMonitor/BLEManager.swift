@@ -110,7 +110,7 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         switch characteristic.uuid {
             case targetCharacteristicUUID:
-                let bpm = heartRate(from: characteristic)
+                let bpm = tempRate(from: characteristic)
                 print(bpm)
             default:
                 print("Unhandled Characteristic UUID: \(characteristic.uuid)")
@@ -122,26 +122,30 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
         
     }
     
-    private func heartRate(from characteristic: CBCharacteristic) -> Float {
+    private func tempRate(from characteristic: CBCharacteristic) -> Float {
         guard let characteristicData = characteristic.value else { return -1 }
         let byteArray = [UInt8](characteristicData)
         
-        let byteTest: [UInt8] =  [byteArray[1], byteArray[2], byteArray[3],byteArray[4]]
-        let dataTest = NSData(bytes: byteTest, length: 4)
-        print(dataTest)
-        let data = NSData(bytes: byteTest, length: 4)
-//        print(data)
+        /* Temp Flag*//*
+        let tempDataFlagUnit = byteArray[0] & 0x01
+        if tempDataFlagUnit == 0 {
+            print("Temperature Units Flag Type : Celsius")
+        } else {
+            print("Temperature Units Flag Type : Fahrenheit")
+        }
+        */
         
-//        let firstBitValue = byteArray[0] & 0x01
-//        if firstBitValue == 0 {
-//            print("Temperature Units Flag Type : Celsius")
-//        } else {
-////            return (Int(byteArray[1]) << 8) + Int(byteArray[2])
-//            print("Temperature Units Flag Type : Fahrenheit")
-//        }
+        /*
+         Temp Data Conversion
+         */
+        let tempByteRow = Int(byteArray[1])
+        let tempByteHigh = Int(byteArray[2]) << 8
+        let tempDataOrigin = tempByteHigh + tempByteRow
+        let tempDataConvertDigit = Int8(bitPattern: byteArray[4])
+        //print(tempDataConvertDigit)
+        let tempDataRestore:Float = Float(tempDataOrigin) * pow(10, Float(tempDataConvertDigit))
 
-        let f = floatValueFromData(data: data as Data)
-        return  f
+        return tempDataRestore
     }
     
     func floatValueFromData(data: Data) -> Float {
