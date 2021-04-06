@@ -17,6 +17,7 @@ struct Peripheral: Identifiable {
 
 class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
+    @Published var tempDataString = "00.00"
     var tempCentralManager: CBCentralManager!
     
 //    var tempRatePeripheral: CBPeripheral!
@@ -110,8 +111,9 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         switch characteristic.uuid {
             case targetCharacteristicUUID:
-                let bpm = tempRate(from: characteristic)
-                print(bpm)
+                let tempValue = tempRate(from: characteristic)
+                print(tempValue)
+                tempDataString = String(tempValue)
             default:
                 print("Unhandled Characteristic UUID: \(characteristic.uuid)")
         }
@@ -147,11 +149,6 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeriph
 
         return tempDataRestore
     }
-    
-    func floatValueFromData(data: Data) -> Float {
-        return Float(bitPattern: UInt32(bigEndian: data.withUnsafeBytes { $0.load(as: UInt32.self) }))
-    }
-    
 
     //Auto Scan Background : Disconnected
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {

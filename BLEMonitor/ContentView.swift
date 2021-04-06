@@ -12,7 +12,6 @@ struct ContentView: View {
     @ObservedObject var bleManager = BLEManager()
     
     var body: some View {
-        
         VStack (spacing: 10) {
 
             Text("Bluetooth Devices")
@@ -37,8 +36,17 @@ struct ContentView: View {
                 .font(.headline)
             
             
-            Text("Temperature Value")
-                .font(.headline)
+            HStack{
+                Spacer()
+                Text(bleManager.tempDataString)
+                    .fontWeight(.regular)
+                    .padding(.leading, 30)
+                    .foregroundColor(.purple)
+                Text("°C")
+                    .fontWeight(.regular)
+                    .foregroundColor(.purple)
+                Spacer()
+            }
 
 
             Text("STATUS")
