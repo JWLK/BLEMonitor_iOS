@@ -32,6 +32,14 @@ struct ContentView: View {
             }.frame(height: 300)
             
             Spacer()
+            
+            Text("Temperature Type")
+                .font(.headline)
+            
+            
+            Text("Temperature Value")
+                .font(.headline)
+
 
             Text("STATUS")
                 .font(.headline)
@@ -88,7 +96,6 @@ struct ContentView: View {
                     .foregroundColor(.red)
             }
             
-            Spacer()
             
         }
     }
